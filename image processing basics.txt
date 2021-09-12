@@ -1,0 +1,161 @@
+####################################################################
+
+#importing images,saving images
+
+import cv2
+import numpy
+
+img =cv2.imread(r'C:\Users\Sahanaka\Desktop\sample.jpg',0)
+resize = cv2.resize(img, (50, 50))
+print(resize)
+#0= gray scale
+#1= color
+#-1= unchanged image
+
+cv2.imshow('sample2',resize)
+cv2.waitKey(0)#waiting at this code until a key is pressed
+cv2.destroyAllWindows()
+cv2.imwrite(r'C:\Users\Sahanaka\Desktop\sample2.jpg',resize)
+
+####################################################################
+
+#working with videos
+
+import numpy as np
+import cv2
+cap = cv2.VideoCapture(0)
+while(True):
+    ret, frame = cap.read()
+    resize = cv2.resize(frame, (50, 50))
+    cv2.imwrite(r'C:\Users\Sahanaka\Desktop\sample2.jpg',resize)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    cv2.imshow('frame',resize)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+
+####################################################################
+
+#drawing/writing on images
+
+import numpy as np
+import cv2
+
+img =cv2.imread(r'C:\Users\Sahanaka\Desktop\sample.jpg',-1)
+
+'''
+Open cv color is not RGB but BGR.So (255,0,0)=blue, (0,255,0)=green ,
+(0,0,255)=red , (255,255,255)=white
+'''
+
+cv2.line(img,(0,0),(200,300),(255,255,255),25)
+#(0,0)=starting cordinate (200,300)=stopping cordinate 50=line width
+
+cv2.rectangle(img,(500,250),(1000,500),(255,255,255),5)
+#(500,250)=top left coord (1000,500)=bottom right coord 5=line width
+
+cv2.circle(img,(447,63), 63, (0,255,0), 10)
+#(447,63)=centre of ccl 63=raddius 10=width and -1=color the inside
+
+pts = np.array([[100,50],[200,300],[700,200],[500,100]], np.int32)
+pts = pts.reshape((-1,1,2))
+cv2.polylines(img, [pts], True, (0,255,255), 3)
+#True - Is closed 3- thickness
+
+font = cv2.FONT_HERSHEY_SIMPLEX
+cv2.putText(img,'OpenCV Tuts!',(10,500), font, 6, (200,255,155), 13)
+#(10,500) - coordinates of the bottom-left corner 6-fontscale 13-thickness
+
+cv2.imshow('image',img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+####################################################################
+
+#image operations
+
+import numpy
+import cv2
+
+img =cv2.imread(r'C:\Users\Sahanaka\Desktop\sample.jpg',-1)
+
+img[100,10]=[255,255,255] #pixel x=55,y=55 is colored white
+
+img[100:150,100:150]=[255,255,255]
+#region of x:100->150  y:100-->150  is colored white
+roi1=img[100:150,100:150]
+img[0:50,0:50]=roi1
+#region of x:100-->150  y:150-->250 is copied to x:0-->50  y:0-->100 
+cv2.imshow('frame',img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+####################################################################
+#identifying red color and blurring
+
+import cv2
+import numpy as np
+
+frame =cv2.imread(r'C:\Users\Sahanaka\Desktop\sample.jpg',-1)
+
+hsv=cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) #converting BGR to HSV range
+
+lower_red=np.array([120,100,100]) #Identifyng lowest HSV values
+upper_red=np.array([180,255,255]) #Identifying heighest HSV values
+
+mask=cv2.inRange(hsv,lower_red,upper_red) #putting mask to capture ranged values
+result=cv2.bitwise_and(frame,frame,mask=mask) #Result using mask and frame
+blur=cv2.GaussianBlur(result,(15,15),0)
+#blur=cv2.GaussianBlur(frame,(kernel size,should be positive and odd),deviation)
+
+cv2.imshow('frame',frame)
+cv2.imshow('mask',mask)
+cv2.imshow('result',result)
+cv2.imshow('blur',blur)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+####################################################################
+
+#encoding
+
+import cv2
+import numpy as np
+
+img =cv2.imread(r'C:\Users\Sahanaka\Desktop\sample.jpg',0)
+print('height, width, color:', img.shape)
+img2 = np.zeros((720, 1280), dtype="uint8")
+print(img2)
+print(img)
+for i in range(len(img)):
+    for j in range(len(img[i])):
+        img2[i,j]=(img[i][j]+i*i+j*j)
+        
+print(img2)
+cv2.imshow('sample2',img2)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+np.savetxt(r'C:\Users\Sahanaka\Desktop\text2.txt', img2, fmt='%d')
+
+####################################################################
+
+#decoding
+
+import cv2
+import numpy as np
+
+array = np.loadtxt(r'C:\Users\Sahanaka\Desktop\text2.txt', dtype=int)
+img2 = np.zeros((720, 1280), dtype="uint8")
+
+for i in range(len(array)):
+    for j in range(len(array[i])):
+        img2[i,j]=(array[i][j]-i*i-j*j)
+        
+print(img2)
+cv2.imshow('decoded',img2)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
